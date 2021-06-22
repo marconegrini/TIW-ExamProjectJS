@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Report</title>
+<link rel="stylesheet" type="text/css" media="all" href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+Report id: <span th:text="${report.reportId}"></span> <br>
+Date and time of creation: <span th:text="${report.dateTime}"></span> <br>
+Appello id: <span th:text="${report.appelloId}"></span> <br>
+
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Surname</th>
+								<th>Student id</th>
+								<th>Grade</th>
+								</tr>
+						</thead>
+						<tbody>
+							<tr th:each="s : ${report.students}">
+								<td th:text="${s.name}"></td>
+								<td th:text="${s.surname}"></td>
+								<td th:text="${s.studentId}"></td>
+								<td th:text="${s.grade}"></td>
+							</tr>
+						</tbody>
+					</table>
+
+<form th:action="@{/GoToRegisteredStudents}" method="POST">
+						<input type="hidden" name="appelloId" th:value="${appelloId}">
+						<input type="hidden" name="appelloDate" th:value="${appelloDate}">
+						<input type="hidden" name="courseName" th:value="${courseName}">
+						<button type="submit" name="action" value="Close">Close report</button>
+					</form>
+
+</body>
+</html>

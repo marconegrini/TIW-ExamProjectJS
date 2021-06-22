@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>TIW-ExamProjectJS</display-name>
+  <context-param>
+    <param-name>dbUrl</param-name>
+    <param-value>jdbc:mysql://localhost:3306/project_schema?serverTimezone=UTC</param-value>
+  </context-param>
+  <context-param>
+    <param-name>dbUser</param-name>
+    <param-value>root</param-value>
+  </context-param>
+  <context-param>
+    <param-name>dbPassword</param-name>
+    <param-value>nm14032p</param-value>
+  </context-param>
+  <context-param>
+    <param-name>dbDriver</param-name>
+    <param-value>com.mysql.cj.jdbc.Driver</param-value>
+  </context-param>
+ <filter> 
+      <filter-name>SessionChecker</filter-name>
+      <filter-class>it.polimi.tiw.projects.filters.SessionChecker</filter-class> 
+ </filter> 
+ <filter> 
+      <filter-name>ProfessorChecker</filter-name>
+      <filter-class>it.polimi.tiw.projects.filters.ProfessorChecker</filter-class> 
+ </filter> 
+ <filter> 
+      <filter-name>StudentChecker</filter-name>
+      <filter-class>it.polimi.tiw.projects.filters.StudentChecker</filter-class> 
+ </filter> 
+ <filter-mapping> 
+    <filter-name>SessionChecker</filter-name> 
+    <url-pattern>/GoToHomeStudent</url-pattern> 
+    <url-pattern>/GoToHomeProfessor</url-pattern> 
+    <url-pattern>/GoToRegisteredStudents</url-pattern> 
+    <url-pattern>/GoToExamResult</url-pattern> 
+	<url-pattern>/Pubblica</url-pattern> 
+	<url-pattern>/UpdateGrade</url-pattern> 
+	<url-pattern>/Verbalizza</url-pattern> 
+	<url-pattern>/GoToReport</url-pattern>
+
+ </filter-mapping>
+<filter-mapping> 
+    <filter-name>ProfessorChecker</filter-name> 
+    <url-pattern>/GoToHomeProfessor</url-pattern>
+    <url-pattern>/GoToRegisteredStudents</url-pattern>  
+	<url-pattern>/UpdateGrade</url-pattern> 
+	<url-pattern>/Pubblica</url-pattern> 
+	<url-pattern>/Verbalizza</url-pattern>
+	<url-pattern>/GoToExamDetails</url-pattern>  
+	<url-pattern>/GoToReport</url-pattern>  
+
+ </filter-mapping>
+<filter-mapping> 
+    <filter-name>StudentChecker</filter-name> 
+    <url-pattern>/GoToHomeStudent</url-pattern> 
+    <url-pattern>/GoToExamResult</url-pattern> 
+
+ </filter-mapping>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
+</web-app>

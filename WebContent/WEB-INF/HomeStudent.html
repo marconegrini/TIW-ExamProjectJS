@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Student's home</title>
+<link rel="stylesheet" type="text/css" media="all" href="../CSS/mystyle.css" th:href="@{/css/mystyle.css}" />
+</head>
+<body>
+	<div align="right">
+		<a th:href="@{/Logout}">Logout</a>
+	</div>
+	<h1>Welcome to the Student Home page</h1>
+	Nice to see you again 
+	<span th:text="${session.student.name}"></span>
+	<span th:text="${session.student.surname}"></span> <br>
+	<span th:text="${session.student.email}"></span> <br>
+	Corso di laurea:
+	<span th:text="${session.student.corsoDiLaurea}"></span> <br>
+	
+	<table>
+		<tr>
+			<td>
+				<table border="1">
+					<thead>
+						<tr>
+							<th>Course Code</th>
+							<th>Course Name</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="p : ${courses}" th:class="(${p.courseId} == ${chosenCourseId})? 'current'">
+							<td th:text="${p.code}"></td>
+							<td><a href="HomeStudent.html" th:href="@{/GoToHomeStudent(courseId=${p.courseId})}"><span
+									th:text="${p.name}"></span></a></td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+			<td>
+				<div th:if="${not #lists.isEmpty(appelli)}">
+						Choose an appello for <span th:text="${chosenCourseName}"></span>:
+							<table border="1">
+								<thead>
+									<tr>
+									<th>Date</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="a : ${appelli}">
+										<td th:text="${a.date}"></td>
+										<td><a th:href="@{/GoToExamResult(course=${a.courseId}, appello=${a.date})}">Details</a></td>
+									</tr>
+								</tbody>
+							</table>
+				</div>
+			</td>
+		</tr>
+	</table>
+	
+	
+	
+</body>
+</html>
