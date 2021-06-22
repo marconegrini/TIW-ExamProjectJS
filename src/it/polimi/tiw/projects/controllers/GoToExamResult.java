@@ -12,11 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
 import it.polimi.tiw.projects.beans.Student;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 
@@ -26,9 +21,7 @@ import it.polimi.tiw.projects.utils.ConnectionHandler;
 @WebServlet("/GoToExamResult")
 public class GoToExamResult extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private Connection connection = null;
-	private TemplateEngine templateEngine;
-       
+	private Connection connection = null;       
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -40,11 +33,6 @@ public class GoToExamResult extends HttpServlet {
     public void init() throws ServletException{
     	connection = ConnectionHandler.getConnection(getServletContext());
 		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
     }
 
 	/**
@@ -76,9 +64,6 @@ public class GoToExamResult extends HttpServlet {
 		
 		String path = "/WEB-INF/ExamResult.html";
 		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("course", courseId);
-		this.templateEngine.process(path, ctx, response.getWriter());
 	}
 
 	/**

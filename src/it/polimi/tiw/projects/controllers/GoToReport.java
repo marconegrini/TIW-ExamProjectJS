@@ -13,11 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
 import it.polimi.tiw.projects.beans.OrderType;
 import it.polimi.tiw.projects.beans.Report;
 import it.polimi.tiw.projects.dao.ReportDAO;
@@ -30,7 +25,6 @@ import it.polimi.tiw.projects.utils.ConnectionHandler;
 public class GoToReport extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -43,11 +37,7 @@ public class GoToReport extends HttpServlet {
     public void init() throws ServletException{
     	connection = ConnectionHandler.getConnection(getServletContext());
 		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
+		
     }
 
 	/**
@@ -82,12 +72,6 @@ public class GoToReport extends HttpServlet {
 		
 		String path = "/WEB-INF/Report.html";
 		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("report", report);
-		ctx.setVariable("appelloId", appelloId);
-		ctx.setVariable("appelloDate", appelloDate);
-		ctx.setVariable("courseName", courseName);
-		this.templateEngine.process(path, ctx, response.getWriter());
 	}
 
 	/**

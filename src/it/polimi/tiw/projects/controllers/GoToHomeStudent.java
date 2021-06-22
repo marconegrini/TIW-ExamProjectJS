@@ -15,11 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
 import it.polimi.tiw.projects.beans.Appello;
 import it.polimi.tiw.projects.beans.Course;
 import it.polimi.tiw.projects.beans.Student;
@@ -33,7 +28,6 @@ import it.polimi.tiw.projects.utils.ConnectionHandler;
 public class GoToHomeStudent extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
 
 	public GoToHomeStudent() {
 		super();
@@ -43,11 +37,7 @@ public class GoToHomeStudent extends HttpServlet {
 	public void init() throws ServletException {
 		connection = ConnectionHandler.getConnection(getServletContext());
 		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
+		
 	}
 
 	
@@ -81,13 +71,7 @@ public class GoToHomeStudent extends HttpServlet {
 		
 		String path = "/WEB-INF/HomeStudent.html";
 		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.setVariable("courses", courses);
-		ctx.setVariable("chosenCourseId", chosenCourseId);
-		ctx.setVariable("chosenCourseName", chosenCourseName);
-		ctx.setVariable("appelli", appelli);
-
-		templateEngine.process(path, ctx, response.getWriter());
+	
 		
 	}
 

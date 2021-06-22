@@ -13,11 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
 import java.util.List;
 
 import it.polimi.tiw.projects.dao.CourseDAO;
@@ -31,7 +26,6 @@ import it.polimi.tiw.projects.beans.*;
 public class GoToRegisteredStudents extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	private TemplateEngine templateEngine;
 	private OrderType orderType;
        
     /**
@@ -45,11 +39,6 @@ public class GoToRegisteredStudents extends HttpServlet {
     public void init() throws ServletException{
     	connection = ConnectionHandler.getConnection(getServletContext());
 		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
 		orderType = new OrderType();
     }
 
@@ -127,13 +116,7 @@ public class GoToRegisteredStudents extends HttpServlet {
 		
 		String path = "/WEB-INF/RegisteredStudents.html";
 		ServletContext servletContext = getServletContext();
-		final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-		ctx.clearVariables();
-		ctx.setVariable("registeredStudents", registeredStudents);
-		ctx.setVariable("appelloDate", appelloDate);
-		ctx.setVariable("courseName", courseName);
-		ctx.setVariable("appelloId", appelloId);
-		this.templateEngine.process(path, ctx, response.getWriter());
+	
 	}
 
 	/**

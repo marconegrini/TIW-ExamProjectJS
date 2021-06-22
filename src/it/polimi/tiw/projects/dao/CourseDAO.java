@@ -8,8 +8,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
-
 import it.polimi.tiw.projects.beans.Appello;
 import it.polimi.tiw.projects.beans.Exam;
 import it.polimi.tiw.projects.beans.Student;

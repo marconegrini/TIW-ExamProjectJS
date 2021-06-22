@@ -7,15 +7,15 @@ import java.sql.Connection;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.UnavailableException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.WebContext;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
+import org.apache.commons.lang.StringEscapeUtils;
+
+import com.google.gson.Gson;
 
 import it.polimi.tiw.projects.beans.Professor;
 import it.polimi.tiw.projects.beans.Student;
@@ -27,11 +27,10 @@ import it.polimi.tiw.projects.enumerations.Role;
 import it.polimi.tiw.projects.utils.ConnectionHandler;
 
 @WebServlet("/CheckLogin")
+@MultipartConfig
 public class CheckLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
-	//motore di interpretazione del template
-	private TemplateEngine templateEngine;
 
 
 	public CheckLogin() {
@@ -39,90 +38,81 @@ public class CheckLogin extends HttpServlet {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void init() throws ServletException {
+	public void init() throws ServletException {	
 		connection = ConnectionHandler.getConnection(getServletContext());
-		ServletContext servletContext = getServletContext();
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver(servletContext);
-		templateResolver.setTemplateMode(TemplateMode.HTML);
-		this.templateEngine = new TemplateEngine();
-		this.templateEngine.setTemplateResolver(templateResolver);
-		templateResolver.setSuffix(".html");
-	}
-
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		
-		String usrn = request.getParameter("username");
-		String pwd = request.getParameter("pwd");
+		String usrn = StringEscapeUtils.escapeJava(request.getParameter("username"));
+		String pwd = StringEscapeUtils.escapeJava(request.getParameter("pwd"));
+		
+		if (usrn == null || pwd == null) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Credentials must be not null");
+			return;
+		}
 		
 		UserDAO user = new UserDAO(connection);
 		User u = null;
 		try {
 			u = user.checkCredentials(usrn, pwd);
 		} catch (SQLException e) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database credential checking");
-			throw new ServletException(e); 
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Internal server error, retry later");
+			return;
  		}
 		
 		String path;	
 		
 		if (u == null) {
-			ServletContext servletContext = getServletContext();
-			final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-			//setting the error message variable if user doesn't exists
-			ctx.setVariable("errorMsg", "Incorrect username or password");
-			path = "/index.html";
-			templateEngine.process(path, ctx, response.getWriter());	
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Incorrect credentials");
+			
 		} else {
+			
+			Gson gson = new Gson();
+			Student stud = null;
+			Professor prof = null;
+			String json = null;
+			
 			if(u.getRole().equals("STUDENT")) {
+				
 				StudentDAO student = new StudentDAO(connection);
-				Student stud = null;
 				try {
 					stud = student.checkStudent(u.getUserId().toString(), u.getUsername(), u.getPassword());
 				} catch (SQLException e) {
-					response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database credential checking");
-					throw new ServletException(e); 
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					response.getWriter().println("Internal server error, retry later");
 		 		}
-				if (stud == null) {
-					ServletContext servletContext = getServletContext();
-					final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-					//setting the error message variable if user doesn't exists
-					ctx.setVariable("errorMsg", "Incorrect username or password");
-					path = "/index.html";
-					templateEngine.process(path, ctx, response.getWriter());
-				} else {
-					request.getSession().setAttribute("student", stud);
-				}
+				if (stud != null) {
+					json = gson.toJson(stud);
+				} 
+				
 			} else {
 				ProfessorDAO professor = new ProfessorDAO(connection);
-				Professor prof = null;
 				try {
 					prof = professor.checkProfessor(u.getUserId().toString(), u.getUsername(), u.getPassword());
 				} catch (SQLException e) {
-					response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in database credential checking");
-					throw new ServletException(e); 
+					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+					response.getWriter().println("Internal server error, retry later");
 		 		}
-				if (prof == null) {
-					ServletContext servletContext = getServletContext();
-					final WebContext ctx = new WebContext(request, response, servletContext, request.getLocale());
-					//setting the error message variable if user doesn't exists
-					ctx.setVariable("errorMsg", "Incorrect username or password");
-					path = "/index.html";
-					templateEngine.process(path, ctx, response.getWriter());
-				} else {
-					request.getSession().setAttribute("professor", prof);
-				}
+				if (prof != null) {
+					json = gson.toJson(prof);
+				} 
 			}
 			
-			String target = (u.getRole().equals("STUDENT")) ? "/GoToHomeStudent" : "/GoToHomeProfessor";
-			path = getServletContext().getContextPath() + target;
-			response.sendRedirect(path);
+			if(json != null) {
+				if(stud == null)
+					request.getSession().setAttribute("professor", prof);
+				else request.getSession().setAttribute("student", stud);
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+				response.getWriter().println(json);
+			}
+				
 		}
 		
 	}

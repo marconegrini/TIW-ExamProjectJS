@@ -2,6 +2,7 @@ package it.polimi.tiw.projects.beans;
 
 public class Student {
 	
+	private String role = "student";
 	private Integer studentId;
 	private String name;
 	private String surname;
@@ -29,6 +30,9 @@ public class Student {
 		return corsoDiLaurea;
 	}
 	
+	public String getRole() {
+		return this.role;
+	}
 	public void setId(Integer i) {
 		studentId = i;
 	}
