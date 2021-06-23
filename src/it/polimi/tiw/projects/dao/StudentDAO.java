@@ -53,7 +53,13 @@ public class StudentDAO {
 					course.setCode(result.getString("code"));
 					course.setName(result.getString("name"));
 					course.setProfessorId(result.getInt("professor"));
-					courses.add(course);
+					boolean alreadyInserted = false;
+					for(Course c : courses) {
+						if(c.getCourseId() == course.getCourseId())
+							alreadyInserted = true;
+					}
+					if(!alreadyInserted)
+						courses.add(course);
 				}
 			}
 		}

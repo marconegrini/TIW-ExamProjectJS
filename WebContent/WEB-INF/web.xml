@@ -32,7 +32,8 @@
 	<filter-mapping>
 		<filter-name>SessionChecker</filter-name>
 		<url-pattern>/GoToHomeStudent</url-pattern>
-		<url-pattern>/GoToHomeProfessor</url-pattern>
+		<url-pattern>/GetProfessorCourses</url-pattern>
+		<url-pattern>/GetProfessorCourseDetails</url-pattern>
 		<url-pattern>/GoToRegisteredStudents</url-pattern>
 		<url-pattern>/GoToExamResult</url-pattern>
 		<url-pattern>/Pubblica</url-pattern>
@@ -43,7 +44,8 @@
 
 	<filter-mapping>
 		<filter-name>ProfessorChecker</filter-name>
-		<url-pattern>/GoToHomeProfessor</url-pattern>
+		<url-pattern>/GetProfessorCourses</url-pattern>
+		<url-pattern>/GetProfessorCourseDetails</url-pattern>
 		<url-pattern>/GoToRegisteredStudents</url-pattern>
 		<url-pattern>/UpdateGrade</url-pattern>
 		<url-pattern>/Pubblica</url-pattern>

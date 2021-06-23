@@ -1,7 +1,3 @@
-/**
- * Login management
- */
-
 (function() { // avoid variables ending up in the global scope
 
   document.getElementById("loginbutton").addEventListener('click', (e) => {
@@ -24,12 +20,12 @@
                 if(user.role == "professor"){
                   sessionStorage.setItem('userId', user.professorId);
                   console.log(user.professorId);
+                  window.location.href = "HomeProfessor.html";
                 } else if(user.role == "student"){
                   sessionStorage.setItem('userId', user.studentId);
                   console.log(user.studentId);
+                  window.location.href = "HomeStudent.html";
                 }
-
-                window.location.href = "Home.html";
                 break;
 
               case 400: // bad request

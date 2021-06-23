@@ -1,4 +1,4 @@
-package it.polimi.tiw.projects.beans;
+	package it.polimi.tiw.projects.beans;
 
 public class Course {
 	
