@@ -51,7 +51,7 @@ public class GetCourseDetails extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		String chosenCourse = request.getParameter("courseId");
+		String chosenCourse = request.getParameter("courseid");
 		Integer courseId = null;
 		CourseDAO cDao = new CourseDAO(connection);
 		List<Appello> appelli = null;

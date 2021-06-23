@@ -1,5 +1,5 @@
 {
-    let courseList, pageOrchestrator = new PageOrchestrator();
+    let courseList, examDate, pageOrchestrator = new PageOrchestrator();
 
     window.addEventListener("load", () => {
         if ((sessionStorage.getItem("role") == null) || (sessionStorage.getItem("userId") == null) || (sessionStorage.getItem("username") == null)) {
@@ -72,25 +72,31 @@
                 anchor = document.createElement("a");
                 linkcell.appendChild(anchor);
                 //adding linking text
-                linkText = document.createTextNode("Detail");
+                linkText = document.createTextNode("Show");
                 anchor.appendChild(linkText);
                 anchor.setAttribute("courseid", course.courseId);
                 anchor.addEventListener("click", (e) => {
                     // dependency via module parameter
-                    examSession.show(e.target.getAttribute("courseid")); // the list must know the details container
+                    examDate.show(e.target.getAttribute("courseid")); // the list must know the details container
                 }, false);   
                 anchor.href = "#";
                 row.appendChild(linkcell);
                 self.listcontainerbody.appendChild(row);
             });
+            this.listcontainer.style.visibility = "visible";
         }
 
         this.autoclick = function(courseId){
-
+            var e = new Event("click");
+            //The Document method querySelector() returns the first Element within the document that matches the specified selector
+          var selector = "a[courseid='" + courseId + "']";
+          var anchorToClick =  
+            (courseId) ? document.querySelector(selector) : this.listcontainerbody.querySelectorAll("a")[0];
+          if (anchorToClick) anchorToClick.dispatchEvent(e);
         }
     }
 
-    function ExamSession(){
+    function ExamDate(){
 
     }
 
@@ -124,8 +130,8 @@
 
         this.refresh = function(){  //currentCourse null at start
             alertContainer.textContent = " ";
-            //courseList.reset();
-            //examSession.reset();
+            courseList.reset();
+            //examDate.reset();
             courseList.show(); //TODO add autolick function 
 
 
