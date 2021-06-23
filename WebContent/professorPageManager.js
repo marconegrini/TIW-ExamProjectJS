@@ -1,10 +1,10 @@
 {
-    let courseList, pageOrchestrator = new PageOrchestrator();
+    let courseList, examDate, pageOrchestrator = new PageOrchestrator();
 
     window.addEventListener("load", () => {
         if ((sessionStorage.getItem("role") == null) || (sessionStorage.getItem("userId") == null) || (sessionStorage.getItem("username") == null)) {
           window.location.href = "index.html";
-        } else {
+        } else {    
           pageOrchestrator.start(); // initialize the components
           pageOrchestrator.refresh();
         } // display initial content
@@ -72,25 +72,96 @@
                 anchor = document.createElement("a");
                 linkcell.appendChild(anchor);
                 //adding linking text
-                linkText = document.createTextNode("Detail");
+                linkText = document.createTextNode("Show");
                 anchor.appendChild(linkText);
                 anchor.setAttribute("courseid", course.courseId);
                 anchor.addEventListener("click", (e) => {
                     // dependency via module parameter
-                    examSession.show(e.target.getAttribute("courseid")); // the list must know the details container
+                    examDate.show(e.target.getAttribute("courseid")); // the list must know the details container
                 }, false);   
                 anchor.href = "#";
                 row.appendChild(linkcell);
                 self.listcontainerbody.appendChild(row);
             });
+            this.listcontainer.style.visibility = "visible";
         }
 
         this.autoclick = function(courseId){
-
+            var e = new Event("click");
+            //The Document method querySelector() returns the first Element within the document that matches the specified selector
+          var selector = "a[courseid='" + courseId + "']";
+          var anchorToClick =  
+            (courseId) ? document.querySelector(selector) : this.listcontainerbody.querySelectorAll("a")[0];
+          if (anchorToClick) anchorToClick.dispatchEvent(e);
         }
     }
 
-    function ExamSession(){
+    function ExamDate(_alert, _detailcontainer, _detailcontainerbody){
+        this.alert = _alert;
+        this.detailcontainer = _detailcontainer;
+        this.detailcontainerbody = _detailcontainerbody;
+
+        this.reset = function(){
+            this.detailcontainer.style.visibility = "hidden";
+            this.alert.style.visibility = "hidden";
+        };
+
+        this.show = function(courseid){
+            var self = this;
+            makeCall("GET", "GetCourseDetails?courseid=" + courseid, null, 
+                function(req) {
+                    if (req.readyState == 4) {
+                        var message = req.responseText;
+                        if (req.status == 200) {
+                            var examdates = JSON.parse(req.responseText);
+                            if (examdates.length == 0) {
+                                self.alert.textContent = "No exams yet!";
+                                self.detailcontainer.style.visibility = "hidden";
+                                self.alert.style.visibility = "visible";
+                                return;
+                            }
+                            self.alert.style.visibility = "hidden";
+                            self.detailcontainer.style.visibility = "visible";
+                            self.update(examdates); // self visible by closure
+                            
+                        } else if (req.status == 403) {
+                            window.location.href = req.getResponseHeader("Location");
+                            window.sessionStorage.removeItem('username');
+                            window.sessionStorage.removeItem('role');
+                            window.sessionStorage.removeItem('userId');
+                        } else {
+                            self.alert.textContent = message;
+                        }
+                    }
+                }
+            );
+        }
+
+        this.update = function(examdates){
+            var elem, i, row, datecell, linkcell, anchor;
+            this.detailcontainerbody.innerHTML = "";
+            var self = this;
+            examdates.forEach(function(examdate){
+                row = document.createElement("tr");
+                datecell = document.createElement("td");
+                datecell.textContent = examdate.date;
+                row.appendChild(datecell);
+                linkcell = document.createElement("td");
+                anchor = document.createElement("a");
+                linkcell.appendChild(anchor);
+                linkText = document.createTextNode("Detail");
+                anchor.appendChild(linkText);
+                anchor.setAttribute("examid", examdate.appelloId);
+                anchor.addEventListener("click", (e) => {
+                    // dependency via module parameter
+                    missionDetails.show(e.target.getAttribute("examid")); // the list must know the details container
+                }, false);
+                anchor.href = "#";
+                row.appendChild(linkcell);
+                self.detailcontainerbody.appendChild(row);
+            });
+            this.detailcontainer.style.visibility = "visible";
+        }
 
     }
 
@@ -114,24 +185,32 @@
                 document.getElementById("id_listcontainerbody")
                 );  
 
+            examDate = new ExamDate(alertContainer, 
+                document.getElementById("id_detailcontainer"),
+                document.getElementById("id_detailcontainerbody"));
+
+
+
             document.querySelector("a[href='Logout']").addEventListener('click', () => {
             window.sessionStorage.removeItem('role');
             window.sessionStorage.removeItem('userId');
             window.sessionStorage.removeItem('username');
-          })
+          });
 
         };
 
-        this.refresh = function(){  //currentCourse null at start
+        this.refresh = function(currentCourse){  //currentCourse null at start
             alertContainer.textContent = " ";
-            //courseList.reset();
-            //examSession.reset();
-            courseList.show(); //TODO add autolick function 
-
-
+            courseList.reset();
+            examDate.reset();
+            courseList.show(function(){
+                courseList.autoclick(currentCourse);
+            }); //TODO add autolick function 
         };
     }
 
 
 
-};
+};/**
+ * 
+ */
