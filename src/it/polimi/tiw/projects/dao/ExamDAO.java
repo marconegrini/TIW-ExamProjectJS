@@ -44,10 +44,17 @@ public class ExamDAO {
 					appello.setDate(result.getDate("date"));
 					
 					exam.setExamId(result.getInt("examId"));
+					exam.setStudentId(student.getId());
+					exam.setStudentName(student.getName());
+					exam.setStudentSurname(student.getSurname());
+					exam.setStudentEmail(student.getEmail());
+					exam.setCorsoDiLaurea(student.getCorsoDiLaurea());
+					exam.setStudent(student);
+					exam.setAppelloId(appello.getAppelloId());
+					exam.setAppelloDate(appello.getDate());
 					exam.setAppello(appello);
 					exam.setStatus(Status.valueOf(result.getString("status")));
 					exam.setGrade(result.getString("grade"));
-					exam.setStudent(student);
 				}
 			}
 		}

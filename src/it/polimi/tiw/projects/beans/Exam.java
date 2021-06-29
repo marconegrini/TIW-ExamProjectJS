@@ -1,13 +1,18 @@
 package it.polimi.tiw.projects.beans;
 
-import java.sql.Date;
-
 import it.polimi.tiw.projects.enumerations.Status;
 
 public class Exam {
 	private int examId;
 	private Student student;
+	private int studentId;
+	private String studentName;
+	private String studentSurname;
+	private String studentEmail;
+	private String corsoDiLaurea;
 	private Appello appello;
+	private int appelloId;
+	private String appelloDate;
 	private Status status;
 	private String grade;
 	
@@ -66,9 +71,37 @@ public class Exam {
 	public void setStudent(Student student) {
 		this.student = student;
 	}
+
+	public void setStudentId(int studentId) {
+		this.studentId = studentId;
+	}
+	
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+	
+	public void setStudentSurname(String studentSurname) {
+		this.studentSurname = studentSurname;
+	}
+	
+	public void setStudentEmail(String studentEmail) {
+		this.studentEmail = studentEmail;
+	}
+	
+	public void setCorsoDiLaurea(String corsoDiLaurea) {
+		this.corsoDiLaurea = corsoDiLaurea;
+	}
 	
 	public void setAppello(Appello appello) {
 		this.appello = appello;
+	}
+	
+	public void setAppelloId(int appelloId) {
+		this.appelloId = appelloId;
+	}
+	
+	public void setAppelloDate(String appelloDate) {
+		this.appelloDate = appelloDate;
 	}
 	
 	public void setStatus(Status status) {

@@ -7,23 +7,27 @@
 	href="CSS/mystyle.css" /> -->
 <script src="utils.js" charset="utf-8" defer></script>
 <script src="professorPageManager.js" charset="utf-8" defer></script>
-<!--  <script src="expenseManagementNoIIFE.js" charset="utf-8" defer></script> -->
-<!--  <script src="sort.js" charset="utf-8" defer></script> -->
+<script src="sort.js" charset="utf-8" defer></script>
 </head>
 
 <body>
+
 	<div align="right">
 		<a href="Logout">Logout</a>
 	</div>
-	<h1>Welcome to the <span id="id_role"></span>'s Home Page</h1> <br>
+
+	<h1>
+		Welcome to the <span id="id_role"></span>'s Home Page
+	</h1>
+	<br>
 	<p>
 		Nice to see you again <span id="id_username"></span>
 	</p>
-	<div id="id_alert" class="alertmessage"></div>
 
 	<table>
+
 		<tr>
-			<td><table id="id_listcontainer" class="boxed">
+			<td><table id="id_listcontainer" class="boxed" border="1">
 					<thead>
 						<tr>
 							<th>Course Code</th>
@@ -32,9 +36,12 @@
 					</thead>
 					<tbody id="id_listcontainerbody">
 					</tbody>
-			</table></td>
-			
+				</table></td>
+				<td><div>
+					<span id="id_alert" class="alertmessage"></span>
+				</div></td>
 		</tr>
+
 		<tr>
 			<td><table id="id_detailcontainer" class="boxed">
 					<thead>
@@ -44,13 +51,115 @@
 					</thead>
 					<tbody id="id_detailcontainerbody">
 					</tbody>
-			</table></td>
+				</table></td>
+		</tr>
+
+		<tr>
+			<td><table id="id_studentcontainer" class="boxed" border="1">
+					<thead>
+						<tr>
+							<th class="sortable">Student id</th>
+							<th class="sortable">Surname</th>
+							<th class="sortable">Name</th>
+							<th class="sortable">Email</th>
+							<th class="sortable">Corso di laurea</th>
+							<th class="sortable">Grade</th>
+							<th class="sortable">Status</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody id="id_studentcontainerbody">
+					</tbody>
+				</table></td>
+			<td>
+				<!--  
+				<div id="id_resultcontainer">
+					<p>
+						Name: <span id="id_studentname"></span>
+					</p>
+					<br>
+					<p>
+						Surname: <span id="id_studentsurname"></span>
+					</p>
+					<br>
+					<p>
+						Matricola: <span id="id_studentid"></span>
+					</p>
+					<br>
+					<p>
+						Email: <span id="id_studentemail"></span>
+					</p>
+					<br>
+					<p>
+						Corso di laurea: <span id="id_studentcdl"></span>
+					</p>
+					<br>
+				</div>
+				-->
+
+				<table id="id_resultcontainer" class="boxed" border="1">
+					<thead>
+						<th>Name</th>
+						<th>Surname</th>
+						<th>Matricola</th>
+						<th>Email</th>
+						<th>Corso di Laurea</th>
+					</thead>
+					<tbody>
+						<td id="id_studentname"></td>
+						<td id="id_studentsurname"></td>
+						<td id="id_studentid"></td>
+						<td id="id_studentemail"></td>
+						<td id="id_studentcdl"></td>
+					</tbody>
+				</table>
+				
+				<form id="id_updatecontainer" action="#">
+								Modify current grade: <br> <select name="grade">
+						<option value="ASSENTE">ASSENTE</option>
+						<option value="RIMANDATO">RIMANDATO</option>
+						<option value="RIPROVATO">RIPROVATO</option>
+						<option value="18">18</option>
+						<option value="19">19</option>
+						<option value="20">20</option>
+						<option value="21">21</option>
+						<option value="22">22</option>
+						<option value="23">23</option>
+						<option value="24">24</option>
+						<option value="25">25</option>
+						<option value="26">26</option>
+						<option value="27">27</option>
+						<option value="28">28</option>
+						<option value="29">29</option>
+						<option value="30">30</option>
+						<option value="30 E LODE">30 E LODE</option>
+					</select>
+					<!--<input type="hidden" name="examId" th:value="${exam.examId}"> -->
+					<input type="submit" name="submit" value="Submit Grade">
+				</form>
 			
+		</td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					<form id="id_pubblicacontainer" action="#">
+						<input type="hidden" name="appelloId">
+						<button type="submit" name="action" value="Pubblica">Pubblica</button>
+					</form>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div>
+					<form id="id_verbalizzacontainer" action="#">
+						<input type="hidden" name="appelloId">
+						<button type="submit" name="action" value="Verbalizza">Verbalizza</button>
+					</form>
+				</div>
+			</td>
 		</tr>
 	</table>
-
-
-
-
 </body>
 </html>

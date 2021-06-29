@@ -57,7 +57,10 @@ public class GetProfessorCourses extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Failure in professor's courses database extraction");
 		}
-		if(courses != null) {
+		if(courses == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+			return;
+		} else {
 			Gson gson = new Gson();
 			String json = gson.toJson(courses);
 			response.setContentType("application/json");

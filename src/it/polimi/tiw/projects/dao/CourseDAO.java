@@ -121,14 +121,49 @@ public class CourseDAO {
 			}
 		} 
 		
-		System.out.println(sortBy + " " + order + " order performed");
-		for(Exam e : registeredStudents) {
-			System.out.println(e.getName());
-			System.out.println(e.getSurname());
-			System.out.println(e.getCorsoDiLaurea());
-		}
 		return registeredStudents;
 	}
 	
-	
+	public List<Exam> findRegisteredStudentsJS(Integer appelloId) throws SQLException{
+		List<Exam> registeredStudents = new ArrayList<Exam>();
+		String query = "SELECT S.studentId, S.name, S.surname, S.email, S.corsoDiLaurea, A.courseId, A.appelloId, A.date, E.examId, E.status, E.grade FROM exams AS E, students AS S, appelli AS A  WHERE E.student = S.studentId AND E.appelloId = A.appelloId AND A.appelloId = ?";
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setString(1, appelloId.toString());
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					Student student = new Student();
+					Appello appello = new Appello();
+					Exam exam = new Exam();
+					
+					student.setId(result.getInt("studentId"));
+					student.setName(result.getString("name"));
+					student.setSurname(result.getString("surname"));
+					student.setEmail(result.getString("email"));
+					student.setCorsoDiLaurea(result.getString("corsoDiLaurea"));
+					
+					appello.setAppelloId(result.getInt("appelloId"));
+					appello.setCourseId(result.getInt("courseId"));
+					appello.setDate(result.getDate("date"));
+					
+					exam.setExamId(result.getInt("examId"));
+					
+					exam.setStudent(student);
+					exam.setStudentId(student.getId());
+					exam.setStudentName(student.getName());
+					exam.setStudentSurname(student.getSurname());
+					exam.setStudentEmail(student.getEmail());
+					exam.setCorsoDiLaurea(student.getCorsoDiLaurea());
+					
+					exam.setAppello(appello);
+					exam.setAppelloDate(appello.getDate());
+					exam.setAppelloId(appello.getAppelloId());
+					exam.setStatus(Status.valueOf(result.getString("status")));
+					exam.setGrade(result.getString("grade"));
+
+					registeredStudents.add(exam);
+				}
+			}
+		} 
+		return registeredStudents;
+	 }
 }
