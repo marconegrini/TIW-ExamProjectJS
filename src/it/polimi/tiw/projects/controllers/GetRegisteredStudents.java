@@ -55,7 +55,8 @@ public class GetRegisteredStudents extends HttpServlet {
 			appelloId = Integer.parseInt(request.getParameter("appelloid"));
 		} catch (IllegalArgumentException | NullPointerException e) {
 			// only for debugging e.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Incorrect appello date value");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Incorrect appello date value");
 			return;
 		}
 		CourseDAO courseDao = new CourseDAO(connection);
@@ -64,10 +65,13 @@ public class GetRegisteredStudents extends HttpServlet {
 			registeredStudents = courseDao.findRegisteredStudentsJS(appelloId);	
 		} catch (SQLException sqle) {
 			//sqle.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in registered students database extraction");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Failure in registered students database extraction");
+			return;
 		}
 		if(registeredStudents == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+			response.getWriter().println("Resource not found");
 			return;
 		} else {
 			Gson gson = new Gson();

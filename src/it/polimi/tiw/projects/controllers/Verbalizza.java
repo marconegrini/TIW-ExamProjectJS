@@ -37,7 +37,6 @@ public class Verbalizza extends HttpServlet {
     
     public void init() throws ServletException{
     	connection = ConnectionHandler.getConnection(getServletContext());
-		ServletContext servletContext = getServletContext();
     }
 
 	
@@ -47,15 +46,12 @@ public class Verbalizza extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		Integer appelloId = null;
-		Date appelloDate = null;
-		String courseName = null;
 		
 		try {
 			appelloId = Integer.parseInt(request.getParameter("appelloId"));
-			appelloDate = Date.valueOf(request.getParameter("appelloDate"));
-			courseName = request.getParameter("courseName");
 		} catch (IllegalArgumentException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameter value");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Invalid parameter value");
 			return;
 		}
 		
@@ -67,11 +63,13 @@ public class Verbalizza extends HttpServlet {
 			verbalize = reportDao.checkReportAvailability();
 		} catch(SQLException sqle) {
 			sqle.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while checking report availability");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Database failure while checking report availability");
 			return;
 		}		
 		if(!verbalize) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No exams to verbalize");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("No exams to verbalize");
 			return;
 		}
 		
@@ -80,7 +78,8 @@ public class Verbalizza extends HttpServlet {
 		try {
 			examDao.verbalizza(appelloId);
 		} catch(SQLException sqle) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while verbalizing grade");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Database failure while verbalizing grade");
 			return;
 		}
 		
@@ -92,7 +91,8 @@ public class Verbalizza extends HttpServlet {
 			if(lastReportIndex == null) throw new SQLException();
 		} catch(SQLException sqle) {
 			sqle.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while creating report");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Database failure while creating report");
 			return;
 		}
 		
@@ -100,13 +100,13 @@ public class Verbalizza extends HttpServlet {
 			reportDao.insertExamsIntoReport(dateTime);
 		} catch(SQLException sqle) {
 			sqle.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while inserting exams into report");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Database failure while inserting exams into report");
 			return;
 		}
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.getWriter().println("Exams verbalized");
 		
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/GoToReport?appelloId=" + appelloId + "&lastReportIndex=" + lastReportIndex + "&appelloDate=" + appelloDate.toString() + "&courseName=" + courseName;
-		response.sendRedirect(path);
 	}
 	public void destroy() {
 		try {

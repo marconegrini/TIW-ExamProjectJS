@@ -56,6 +56,7 @@ public class GetProfessorCourses extends HttpServlet {
 			//e.printStackTrace();
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Failure in professor's courses database extraction");
+			return;
 		}
 		if(courses == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource not found");

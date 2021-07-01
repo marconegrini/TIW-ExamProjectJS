@@ -49,10 +49,12 @@ public class GetExamDetails extends HttpServlet {
 			exam = examDao.findExamById(request.getParameter("examId"));
 		} catch (SQLException sqle) {
 				response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in exam database extraction");
+				return;
 		}
 		if(exam == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("CourseId must not be null");
+			return;
 		} else {
 			Gson gson = new Gson();
 			String json = gson.toJson(exam);

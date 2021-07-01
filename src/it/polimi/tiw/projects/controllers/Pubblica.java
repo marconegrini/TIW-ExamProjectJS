@@ -33,9 +33,7 @@ public class Pubblica extends HttpServlet {
     }
     
     public void init() throws ServletException{
-    	connection = ConnectionHandler.getConnection(getServletContext());
-		ServletContext servletContext = getServletContext();
-	
+    	connection = ConnectionHandler.getConnection(getServletContext());	
     }
 
 	/**
@@ -44,28 +42,32 @@ public class Pubblica extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ExamDAO examDao = new ExamDAO(connection);
 		Integer appelloId = null;
-		Date appelloDate = null;
-		String courseName = null;
+		boolean badRequest = false;
+		boolean sqlEx = false;
 		
 		try {
 			appelloId = Integer.parseInt(request.getParameter("appelloId"));
-			appelloDate = Date.valueOf(request.getParameter("appelloDate"));
-			courseName = request.getParameter("courseName");
 		} catch (IllegalArgumentException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameter value");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Invalid parameter value");
+			badRequest = true;
 			return;
 		}
 		
-		try {
-			examDao.pubblica(appelloId);
-		} catch(SQLException sqle) {
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while updating grade");
-			return;
+		if(!badRequest) {
+			try {
+				examDao.pubblica(appelloId);
+			} catch(SQLException sqle) {
+				sqlEx = true;
+				response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+				response.getWriter().println("Database failure while updating grade");
+				return;
+			}
+			if(!sqlEx) {
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.getWriter().println("Grades published");
+			}
 		}
-	
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/GoToRegisteredStudents?appelloDate=" + appelloDate + "&appelloId=" + appelloId.toString() + "&courseName=" + courseName;
-		response.sendRedirect(path);
 	}
 	
 	

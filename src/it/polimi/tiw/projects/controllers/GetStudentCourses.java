@@ -55,6 +55,7 @@ public class GetStudentCourses extends HttpServlet {
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Failure in professor's courses database extraction");
+			return;
 		}
 		
 		if(courses != null) {

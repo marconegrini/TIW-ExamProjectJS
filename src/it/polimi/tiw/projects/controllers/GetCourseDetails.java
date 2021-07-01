@@ -59,12 +59,14 @@ public class GetCourseDetails extends HttpServlet {
 		if (chosenCourse == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("CourseId must not be null");
+			return;
 		} else {
 			try {
 				courseId = Integer.parseInt(chosenCourse);
 			} catch (NumberFormatException e) {
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				response.getWriter().println("CourseId must be an integer");
+				return;
 			}
 			if (courseId != null) {
 				try {
@@ -74,6 +76,7 @@ public class GetCourseDetails extends HttpServlet {
 					// e.printStackTrace();
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					response.getWriter().println("Failure in exam sessions database extraction");
+					return;
 				}
 				if(appelli != null) {
 					Gson gson = new Gson();

@@ -51,13 +51,12 @@ public class UpdateGrade extends HttpServlet {
 		
 		Integer examId = null;
 		String grade = null;
-		String courseName = null;
 		try {
 			examId = Integer.parseInt(request.getParameter("examId"));
 			grade = request.getParameter("grade");
-			courseName = request.getParameter("courseName");
 		} catch (IllegalArgumentException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameter value");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Invalid parameter value");
 			return;
 		}
 		System.out.println(grade);
@@ -69,13 +68,14 @@ public class UpdateGrade extends HttpServlet {
 			examDao.insertGrade(grade, examId);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while updating grade");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Database failure while updating grade");
 			return;
 		}
 		
-		String ctxpath = getServletContext().getContextPath();
-		String path = ctxpath + "/GoToRegisteredStudents?appelloDate=" + exam.getDate() + "&appelloId=" + exam.getAppelloId().toString() + "&courseName=" + courseName;
-		response.sendRedirect(path);
+		response.setStatus(HttpServletResponse.SC_OK);
+		response.getWriter().println("Grade updated correctly");
+		
 	}
 	
 	public void destroy() {

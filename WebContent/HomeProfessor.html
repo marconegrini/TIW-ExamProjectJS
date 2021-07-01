@@ -37,7 +37,7 @@
 					<tbody id="id_listcontainerbody">
 					</tbody>
 				</table></td>
-				<td><div>
+			<td><div align="left">
 					<span id="id_alert" class="alertmessage"></span>
 				</div></td>
 		</tr>
@@ -71,37 +71,13 @@
 					<tbody id="id_studentcontainerbody">
 					</tbody>
 				</table></td>
-			<td>
-				<!--  
-				<div id="id_resultcontainer">
-					<p>
-						Name: <span id="id_studentname"></span>
-					</p>
-					<br>
-					<p>
-						Surname: <span id="id_studentsurname"></span>
-					</p>
-					<br>
-					<p>
-						Matricola: <span id="id_studentid"></span>
-					</p>
-					<br>
-					<p>
-						Email: <span id="id_studentemail"></span>
-					</p>
-					<br>
-					<p>
-						Corso di laurea: <span id="id_studentcdl"></span>
-					</p>
-					<br>
-				</div>
-				-->
 
-				<table id="id_resultcontainer" class="boxed" border="1">
+			<td>
+				<table id="id_studentinfocontainer" class="boxed" border="1">
 					<thead>
 						<th>Name</th>
 						<th>Surname</th>
-						<th>Matricola</th>
+						<th>Student id</th>
 						<th>Email</th>
 						<th>Corso di Laurea</th>
 					</thead>
@@ -113,9 +89,14 @@
 						<td id="id_studentcdl"></td>
 					</tbody>
 				</table>
-				
+				<div id="id_gradecontainer">
+					<p>
+					Grade: <span id="id_grade"></span>
+					</p>
+				</div>
 				<form id="id_updatecontainer" action="#">
-								Modify current grade: <br> <select name="grade">
+					Modify current grade: <br> 
+					<select id="id_selectgrade" name="grade">
 						<option value="ASSENTE">ASSENTE</option>
 						<option value="RIMANDATO">RIMANDATO</option>
 						<option value="RIPROVATO">RIPROVATO</option>
@@ -134,18 +115,19 @@
 						<option value="30">30</option>
 						<option value="30 E LODE">30 E LODE</option>
 					</select>
-					<!--<input type="hidden" name="examId" th:value="${exam.examId}"> -->
-					<input type="submit" name="submit" value="Submit Grade">
+					<input type="hidden" name="examid">
+					<input type="hidden" name="appelloid">
+					<input type="button" name="button" value="Submit Grade">
 				</form>
-			
-		</td>
+			</td>
+
 		</tr>
 		<tr>
 			<td>
 				<div>
-					<form id="id_pubblicacontainer" action="#">
-						<input type="hidden" name="appelloId">
-						<button type="submit" name="action" value="Pubblica">Pubblica</button>
+					<form id="id_pubblicaform" action="#">
+						<input type="hidden" name="appelloid">
+						<input type="button" type="button" name="Pubblica" value="Pubblica">
 					</form>
 				</div>
 			</td>
@@ -153,9 +135,9 @@
 		<tr>
 			<td>
 				<div>
-					<form id="id_verbalizzacontainer" action="#">
-						<input type="hidden" name="appelloId">
-						<button type="submit" name="action" value="Verbalizza">Verbalizza</button>
+					<form id="id_verbalizzaform" action="#">
+						<input type="hidden" name="appelloid">
+						<input type="button" type="button" name="Pubblica" value="Verbalizza">
 					</form>
 				</div>
 			</td>

@@ -69,7 +69,7 @@ public class CheckLogin extends HttpServlet {
 		if (u == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			response.getWriter().println("Incorrect credentials");
-			
+			return;
 		} else {
 			
 			Gson gson = new Gson();
@@ -85,6 +85,7 @@ public class CheckLogin extends HttpServlet {
 				} catch (SQLException e) {
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					response.getWriter().println("Internal server error, retry later");
+					return;
 		 		}
 				if (stud != null) {
 					json = gson.toJson(stud);
@@ -97,6 +98,7 @@ public class CheckLogin extends HttpServlet {
 				} catch (SQLException e) {
 					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 					response.getWriter().println("Internal server error, retry later");
+					return;
 		 		}
 				if (prof != null) {
 					json = gson.toJson(prof);
@@ -104,9 +106,10 @@ public class CheckLogin extends HttpServlet {
 			}
 			
 			if(json != null) {
-				if(stud == null)
+				if(stud == null) 
 					request.getSession().setAttribute("professor", prof);
 				else request.getSession().setAttribute("student", stud);
+				
 				response.setStatus(HttpServletResponse.SC_OK);
 				response.setContentType("application/json");
 				response.setCharacterEncoding("UTF-8");

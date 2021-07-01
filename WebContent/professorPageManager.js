@@ -82,7 +82,7 @@
                     // dependency via module parameter
                     registeredStudents.reset();
                     resultDetail.reset();
-                    examDate.show(e.target.getAttribute("courseid"), self.listcontainer); // the list must know the details container
+                    examDate.show(e.target.getAttribute("courseid")); // the list must know the details container
                 }, false);   
                 anchor.href = "#";
                 row.appendChild(linkcell);
@@ -111,8 +111,7 @@
             this.alert.style.visibility = "hidden";
         };
 
-        this.show = function(courseid, _courselistcontainer){
-            this.courselistcontainer = _courselistcontainer;
+        this.show = function(courseid){
             var self = this;
             makeCall("GET", "GetCourseDetails?courseid=" + courseid, null, 
                 function(req) {
@@ -171,23 +170,74 @@
         }
     }
 
-    function RegisteredStudents(_alert, _studentcontainer, _studentcontainerbody, _pubblicacontainer, _verbalizzacontainer){
+    function RegisteredStudents(_alert, _studentcontainer, _studentcontainerbody, _pubblicaform, _verbalizzaform){
         this.alert = _alert;
         this.studentcontainer = _studentcontainer;
         this.studentcontainerbody = _studentcontainerbody;
-        this.pubblicacontainer = _pubblicacontainer;
-        this.verbalizzacontainer = _verbalizzacontainer; 
+        this.pubblicaform = _pubblicaform;
+        this.verbalizzaform = _verbalizzaform;
 
         this.reset = function(){
             this.alert.style.visibility = "hidden";
             this.studentcontainer.style.visibility = "hidden";
-            this.pubblicacontainer.style.visibility = "hidden";
-            this.verbalizzacontainer.style.visibility = "hidden";
+            this.pubblicaform.style.visibility = "hidden";
+            this.verbalizzaform.style.visibility = "hidden";
         }
 
-        this.show = function(appelloId){
+        this.registerEvents = function() {
+
+           this.pubblicaform.querySelector("input[type='button']").addEventListener('click', (event) => {
+            var self = this,
+              form = event.target.closest("form"),
+              appelloid = form.querySelector("input[type = 'hidden']").value;
+            makeCall("POST", 'Pubblica?appelloId=' + appelloid, form,
+              function(req) {
+                if (req.readyState == 4) {
+                  var message = req.responseText;
+                  console.log(message);
+                  if (req.status == 200) {
+                    self.show(appelloid);
+                  } else if (req.status == 403) {
+                    window.location.href = req.getResponseHeader("Location");
+                    window.sessionStorage.removeItem('username');
+                    window.sessionStorage.removeItem('role');
+                    window.sessionStorage.removeItem('userId');
+                  } else {
+                    self.alert.textContent = message;
+                  }
+                }
+              }
+            );
+          });
+
+           this.verbalizzaform.querySelector("input[type='button']").addEventListener('click', (event) => {
+            var self = this,
+              form = event.target.closest("form"),
+              appelloid = form.querySelector("input[type = 'hidden']").value;
+            makeCall("POST", 'Verbalizza?appelloId=' + appelloid, form,
+              function(req) {
+                if (req.readyState == 4) {
+                  var message = req.responseText;
+                  console.log(message);
+                  if (req.status == 200) {
+                    self.show(appelloid);
+                  } else if (req.status == 403) {
+                    window.location.href = req.getResponseHeader("Location");
+                    window.sessionStorage.removeItem('username');
+                    window.sessionStorage.removeItem('role');
+                    window.sessionStorage.removeItem('userId');
+                  } else {
+                    self.alert.textContent = message;
+                  }
+                }
+              }
+            );
+          });
+        }
+        
+        this.show = function(appelloid){
             var self = this;
-            makeCall("GET", "GetRegisteredStudents?appelloid=" + appelloId, null, 
+            makeCall("GET", "GetRegisteredStudents?appelloid=" + appelloid, null, 
                 function(req) {
                     if (req.readyState == 4) {
                         var message = req.responseText;
@@ -201,8 +251,12 @@
                             }
                             self.alert.style.visibility = "hidden";
                             self.studentcontainer.style.visibility = "visible";
-                            self.pubblicacontainer.style.visibility = "visible";
-                            self.verbalizzacontainer.style.visibility = "visible";
+                            self.pubblicaform.style.visibility = "visible";
+                            self.verbalizzaform.style.visibility = "visible";
+                            //setting appelloid in pubblica and verbalizza buttons, 
+                            //in order to verbalize or publish exams of the correct appello.
+                            self.pubblicaform.appelloid.value = appelloid;
+                            self.verbalizzaform.appelloid.value = appelloid;
                             self.update(registeredStudents); // self visible by closure
                             
                         } else if (req.status == 403) {
@@ -274,20 +328,58 @@
 
     function ResultDetails(options){
         this.alert = options['alert'];
-        this.resultcontainer = options['resultcontainer'];
+        this.studentinfocontainer = options['studentinfocontainer'];
         this.name = options['name'];
         this.surname = options['surname'];
         this.id = options['id'];
         this.email = options['email'];
         this.cdl = options['cdl'];
+        //updatecontainer is the form to modify student's exam grade.
+        //Needs to contains examid's value.
         this.updatecontainer = options['updatecontainer'];
+        this.gradecontainer = options['gradecontainer'];
 
         this.reset = function(){
-            this.resultcontainer.style.visibility = "hidden";
+            this.studentinfocontainer.style.visibility = "hidden";
             this.updatecontainer.style.visibility = "hidden";
+            this.gradecontainer.style.visibility = "hidden";
         }
         
-       
+        this.registerEvents = function(registeredStudents){
+            this.updatecontainer.querySelector("input[type='button']").addEventListener('click', (e) => {
+            var form = e.target.closest("form");
+            if (form.checkValidity()) {
+              var self = this;
+              var options = document.getElementById("id_selectgrade").options;
+              var selectedOption = document.getElementById("id_selectgrade").selectedIndex;
+              var gradeToSubmit = options[selectedOption].text;
+              var examid = form.querySelector("input[type='hidden'][name='examid']").value;
+              var appelloid = form.querySelector("input[type='hidden'][name='appelloid']").value;
+              makeCall("POST", 'UpdateGrade?examId=' + examid + "&grade=" + gradeToSubmit, form,
+                function(req) {
+                  if (req.readyState == 4) {
+                    var message = req.responseText;
+                    console.log(message);
+                    if (req.status == 200) {
+                        //closing exam result details and refreshing registered students table
+                        self.reset();
+                        registeredStudents.show(appelloid);
+                    } else if (req.status == 403) {
+                  window.location.href = req.getResponseHeader("Location");
+                  window.sessionStorage.removeItem('username');
+                  }
+                  else {
+                      self.alert.textContent = message;
+                    }
+                  }
+                }
+              );
+            } else {
+              form.reportValidity();
+            }
+          });
+        }
+
         this.show = function(examid){
             var self = this; 
             makeCall("GET", "GetExamDetails?examId=" + examid, null,
@@ -297,18 +389,32 @@
                         if(req.status == 200){
                             var exam = JSON.parse(req.responseText);
                             self.update(exam);
-                            self.resultcontainer.style.visibility = "visible";
+                            self.studentinfocontainer.style.visibility = "visible";
                             switch(exam.status){
                                 case "INSERITO":
+                                self.updatecontainer.style.visibility = "visible";
+                                self.gradecontainer.style.visibility = "hidden";
+                                self.updatecontainer.examid.value = exam.examId;
+                                self.updatecontainer.appelloid.value = exam.appelloId;
                                     break;
                                 case "NONINSERITO":
                                     self.updatecontainer.style.visibility = "visible";
+                                    self.gradecontainer.style.visibility = "hidden";
+                                    self.updatecontainer.examid.value = exam.examId;
+                                    self.updatecontainer.appelloid.value = exam.appelloId;
                                     break;
                                 case "PUBBLICATO":
+                                    self.updatecontainer.style.visibility = "hidden";
+                                    self.gradecontainer.style.visibility = "visible";
+                                    self.gradecontainer.textContent = exam.grade;
                                     break;
                                 case "RIFIUTATO":
+
                                     break;
                                 case "VERBALIZZATO":
+                                    self.updatecontainer.style.visibility = "hidden";
+                                    self.gradecontainer.style.visibility = "visible";
+                                    self.gradecontainer.textContent = exam.grade;
                                     break;
                             }
                         } else if(req.status == 403) {
@@ -325,15 +431,14 @@
         }
 
         this.update = function(exam){
-            console.log(exam);
             this.name.textContent = exam.studentName;
             this.surname.textContent = exam.studentSurname;
             this.email.textContent = exam.studentEmail;
             this.id.textContent = exam.studentId;
             this.cdl.textContent = exam.corsoDiLaurea;
+            this.gradecontainer.textContent = exam.grade;
         }
     }
-
 
     function PageOrchestrator(){
 
@@ -360,21 +465,24 @@
             registeredStudents = new RegisteredStudents(alertContainer, 
                 document.getElementById("id_studentcontainer"),
                 document.getElementById("id_studentcontainerbody"),
-                document.getElementById("id_pubblicacontainer"),
-                document.getElementById('id_verbalizzacontainer'));
+                document.getElementById("id_pubblicaform"),
+                document.getElementById("id_verbalizzaform"));
+
+            registeredStudents.registerEvents();
 
             resultDetail = new ResultDetails({
                 alert : alertContainer,
-                resultcontainer : document.getElementById("id_resultcontainer"),
+                studentinfocontainer : document.getElementById("id_studentinfocontainer"),
                 name : document.getElementById("id_studentname"),
                 surname : document.getElementById("id_studentsurname"),
                 id : document.getElementById("id_studentid"),
                 email : document.getElementById("id_studentemail"),
                 cdl : document.getElementById("id_studentcdl"),
-                updatecontainer : document.getElementById("id_updatecontainer")
+                updatecontainer : document.getElementById("id_updatecontainer"),
+                gradecontainer : document.getElementById("id_gradecontainer")
             });
 
-            //resultDetail.registerEvents(this);
+            resultDetail.registerEvents(registeredStudents);
 
             document.querySelector("a[href='Logout']").addEventListener('click', () => {
             window.sessionStorage.removeItem('role');
@@ -396,8 +504,4 @@
         };
     }
 
-
-
-};/**
- * 
- */
+};
