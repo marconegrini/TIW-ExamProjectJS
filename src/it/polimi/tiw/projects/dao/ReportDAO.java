@@ -20,17 +20,18 @@ public class ReportDAO {
 		this.con = connection;
 	}
 	
-	public boolean checkReportAvailability() throws SQLException {
-		Integer examId = null;
-		String query = "SELECT COUNT(*) FROM exams WHERE status = 'PUBBLICATO'";
+	public boolean checkReportAvailability(Integer appelloId) throws SQLException {
+		Integer examNumber = null;
+		String query = "SELECT COUNT(*) FROM exams WHERE (status = 'PUBBLICATO' OR status = 'RIFIUTATO') AND appelloId = ?";
 		try(PreparedStatement pstatement = con.prepareStatement(query);){
+			pstatement.setInt(1, appelloId);
 			try(ResultSet result = pstatement.executeQuery();){
 				result.next();
-				examId = result.getInt("COUNT(*)");	
+				examNumber = result.getInt("COUNT(*)");	
 			}
 		}
-		System.out.println(examId);
-		if(examId > 0) 
+		System.out.println("Exams to verbalize: " + examNumber);
+		if(examNumber > 0) 
 			return true;
 		return false;
 	}

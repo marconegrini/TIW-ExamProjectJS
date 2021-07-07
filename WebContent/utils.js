@@ -17,3 +17,17 @@
 	      formElement.reset();
 	    }
 	  }
+
+	  function makeJsonCall(method, url, formElement, cback, reset = true){
+	  	var req = new XMLHttpRequest(); // visible by closure
+	    req.onreadystatechange = function() {
+	      cback(req)
+	    }; // closure
+	    req.open(method, url);
+	    req.setRequestHeader("ContentType", "application/json");
+	    if (formElement == null) {
+	      req.send();
+	    } else {
+	      req.send(formElement);
+	    }
+	  }

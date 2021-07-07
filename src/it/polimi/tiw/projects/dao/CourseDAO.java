@@ -40,6 +40,25 @@ public class CourseDAO {
 		return appelli;
 	}
 	
+	public List<Appello> findStudentAppelli(String courseId, String studentId) throws SQLException {
+		List<Appello> appelli = new ArrayList<Appello>();
+		String query = "SELECT A.appelloId, A.courseId, A.date FROM appelli AS A JOIN exams AS E WHERE A.courseId = ? AND E.appelloId = A.appelloId AND E.student = ? ORDER BY date DESC";
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setString(1, courseId);
+			pstatement.setString(2, studentId);
+			try (ResultSet result = pstatement.executeQuery();) {
+				while (result.next()) {
+					Appello appello = new Appello();
+					appello.setCourseId(result.getInt("courseId"));
+					appello.setDate(result.getDate("date"));
+					appello.setAppelloId(result.getInt("appelloId"));
+					appelli.add(appello);
+				}
+			}
+		}
+		return appelli;
+	}
+	
 	public List<Exam> findRegisteredStudents(Integer appelloId, String sortBy, String order) throws SQLException{
 		List<Exam> registeredStudents = new ArrayList<Exam>();
 		String query = null;

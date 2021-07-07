@@ -29,10 +29,13 @@ public class ProfessorChecker implements Filter{
 		// java.lang.String loginpath = "/index.html";
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		String loginpath = req.getServletContext().getContextPath() + "/index.html";
 		HttpSession s = req.getSession();
+		String loginpath = req.getServletContext().getContextPath() + "/index.html";
+
 		if (s.getAttribute("professor") == null) {
-			res.sendRedirect(loginpath);
+			res.setStatus(403);
+			res.setHeader("Location", loginpath);
+			System.out.print("Professor login checker FAILED...\n");
 			return;
 		}
 		

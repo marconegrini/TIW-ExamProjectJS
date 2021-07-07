@@ -27,8 +27,11 @@ public class StudentChecker implements Filter{
 		HttpServletResponse res = (HttpServletResponse) response;
 		String loginpath = req.getServletContext().getContextPath() + "/index.html";
 		HttpSession s = req.getSession();
+		
 		if (s.getAttribute("student") == null) {
-			res.sendRedirect(loginpath);
+			res.setStatus(403);
+			res.setHeader("Location", loginpath);
+			System.out.print("Student login checker FAILED...\n");
 			return;
 		}
 		// pass the request along the filter chain

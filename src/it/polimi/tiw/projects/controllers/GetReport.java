@@ -8,10 +8,13 @@ import java.util.IllegalFormatException;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.google.gson.Gson;
 
 import it.polimi.tiw.projects.beans.OrderType;
 import it.polimi.tiw.projects.beans.Report;
@@ -21,23 +24,22 @@ import it.polimi.tiw.projects.utils.ConnectionHandler;
 /**
  * Servlet implementation class GoToReport
  */
-@WebServlet("/GoToReport")
-public class GoToReport extends HttpServlet {
+@WebServlet("/GetReport")
+@MultipartConfig
+public class GetReport extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public GoToReport() {
+    public GetReport() {
         super();
         // TODO Auto-generated constructor stub
     }
     
     public void init() throws ServletException{
-    	connection = ConnectionHandler.getConnection(getServletContext());
-		ServletContext servletContext = getServletContext();
-		
+    	connection = ConnectionHandler.getConnection(getServletContext());		
     }
 
 	/**
@@ -46,17 +48,12 @@ public class GoToReport extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		Integer lastReportIndex = null;
-		Integer appelloId = null;
-		Date appelloDate = null;
-		String courseName = null;
 		
 		try {
 			lastReportIndex = Integer.parseInt(request.getParameter("lastReportIndex"));
-			appelloId = Integer.parseInt(request.getParameter("appelloId"));
-			appelloDate = Date.valueOf(request.getParameter("appelloDate"));
-			courseName = request.getParameter("courseName");
 		} catch(IllegalArgumentException | NullPointerException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid parameter value");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Invalid parameter value");
 			return;
 		}
 		
@@ -66,12 +63,17 @@ public class GoToReport extends HttpServlet {
 			report = reportDao.getLastReport(lastReportIndex);
 		} catch (SQLException sqle) {
 			sqle.printStackTrace();
-			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Database failure while getting last report created");
+			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.getWriter().println("Database failure while getting last report created");
 			return;
 		}
 		
-		String path = "/WEB-INF/Report.html";
-		ServletContext servletContext = getServletContext();
+		Gson gson = new Gson();
+		String jsonMessage = gson.toJson(report);
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(jsonMessage);
+		
 	}
 
 	/**

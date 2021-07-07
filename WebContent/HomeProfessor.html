@@ -3,8 +3,7 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Home</title>
-<!--<link rel="stylesheet" type="text/css" media="all"
-	href="CSS/mystyle.css" /> -->
+
 <script src="utils.js" charset="utf-8" defer></script>
 <script src="professorPageManager.js" charset="utf-8" defer></script>
 <script src="sort.js" charset="utf-8" defer></script>
@@ -65,14 +64,14 @@
 							<th class="sortable">Corso di laurea</th>
 							<th class="sortable">Grade</th>
 							<th class="sortable">Status</th>
+							<th>Insert Grade</th>
 							<th></th>
 						</tr>
 					</thead>
 					<tbody id="id_studentcontainerbody">
 					</tbody>
 				</table></td>
-
-			<td>
+				<td>
 				<table id="id_studentinfocontainer" class="boxed" border="1">
 					<thead>
 						<th>Name</th>
@@ -120,7 +119,25 @@
 					<input type="button" name="button" value="Submit Grade">
 				</form>
 			</td>
-
+		</tr>
+		<tr>
+			<td>
+				<div>
+						<form id="id_multipleform" action="#">
+						<input type="hidden" name="appelloid">
+						<input type="button" type="button" name="Inserimento Multiplo" value="Inserimento Multiplo">
+					</form>
+				</div>
+			</td>
+			<td>
+				<div>
+						<form id="id_submitgrade" action="#">
+						<input type="hidden" name="appelloid">
+						<input type="button" type="button" name="Submit" value="Submit">
+					</form>
+				</div>
+			</td>
+		</tr>
 		</tr>
 		<tr>
 			<td>
@@ -142,6 +159,36 @@
 				</div>
 			</td>
 		</tr>
+
+
+		<tr>
+			<td>
+				<div id="id_report">
+					Report id: <span id="id_reportid"></span> <br>
+					Date and time of creation: <span id="id_reportdatetime"></span> <br>
+					Appello id: <span id="id_reportappelloid"></span> <br>
+
+					<table id="id_studentreportcontainer">
+						<thead>
+							<tr>
+								<th>Name</th>
+								<th>Surname</th>
+								<th>Student id</th>
+								<th>Grade</th>
+							</tr>
+						</thead>
+						<tbody id="id_studentreportcontainerbody">
+						</tbody>
+					</table>
+				</div>
+				<form id="id_closeform" action="#">
+					<input type="button" type="button" name="CloseReport" value="Close Report">
+				</form>
+
+			</td>	
+		</tr>
+
+
 	</table>
 </body>
 </html>

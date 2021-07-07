@@ -1,5 +1,5 @@
 {
-    let courseList, examDate, registeredStudents, report, resultDetail, pageOrchestrator = new PageOrchestrator();
+    let courseList, examDate, registeredStudents, report, pageOrchestrator = new PageOrchestrator();
     
     window.addEventListener("load", () => {
         if ((sessionStorage.getItem("role") == null) || (sessionStorage.getItem("userId") == null) || (sessionStorage.getItem("username") == null)) {
@@ -83,7 +83,6 @@
                 anchor.addEventListener("click", (e) => {
                     // dependency via module parameter
                     report.reset();
-                    resultDetail.reset();
                     registeredStudents.reset();
                     examDate.show(e.target.getAttribute("courseid")); // the list must know the details container
                 }, false);   
@@ -165,7 +164,6 @@
                 anchor.addEventListener("click", (e) => {   
                     // dependency via module parameter
                     report.reset();
-                    resultDetail.reset();
                     registeredStudents.reset();
                     registeredStudents.show(e.target.getAttribute("appelloid")); // the list must know the details container
                 }, false);
@@ -177,15 +175,13 @@
         }
     }
 
-    function RegisteredStudents(_alert, _studentcontainer, _studentcontainerbody, _pubblicaform, _verbalizzaform, _submitgrade, _multipleform){
+    function RegisteredStudents(_alert, _studentcontainer, _studentcontainerbody, _pubblicaform, _verbalizzaform, _submitgrade){
         this.alert = _alert;
         this.studentcontainer = _studentcontainer;
         this.studentcontainerbody = _studentcontainerbody;
         this.pubblicaform = _pubblicaform;
         this.verbalizzaform = _verbalizzaform;
         this.submitgrade = _submitgrade;
-        this.multipleform = _multipleform;
-        this.multipleinsertion = false;
 
         this.reset = function(){
             this.alert.style.visibility = "hidden";
@@ -193,21 +189,9 @@
             this.pubblicaform.style.visibility = "hidden";
             this.verbalizzaform.style.visibility = "hidden";
             this.submitgrade.style.visibility = "hidden";
-            this.multipleform.style.visibility = "hidden";
-            this.multipleinsertion = false;
         }
 
         this.registerEvents = function() {
-
-            this.multipleform.querySelector("input[type='button']").addEventListener('click', (event) => {
-                var self = this;
-                this.multipleinsertion = true;
-                report.reset();
-                resultDetail.reset();
-                form = event.target.closest("form");
-                appelloid = form.querySelector("input[type = 'hidden']").value;
-                self.show(appelloid);
-            });
 
             this.submitgrade.querySelector("input[type='button']").addEventListener('click', (event) => {
                 var self = this;
@@ -253,7 +237,8 @@
                     }
                 }
             })
-            });
+
+    });
 
             this.pubblicaform.querySelector("input[type='button']").addEventListener('click', (event) => {
                 var self = this;
@@ -325,19 +310,12 @@
                             self.studentcontainer.style.visibility = "visible";
                             self.pubblicaform.style.visibility = "visible";
                             self.verbalizzaform.style.visibility = "visible";
-                            self.multipleform.style.visibility = "visible";
-
-                            if(self.multipleinsertion){
-                                self.submitgrade.style.visibility = "visible";
-                            } else {
-                                self.submitgrade.style.visibility = "hidden";
-                            }                                
+                            self.submitgrade.style.visibility = "visible";
                             //setting appelloid in pubblica, verbalizza and submit buttons, 
                             //in order to set, publish or verbalize exams of the correct appello.
                             self.pubblicaform.appelloid.value = appelloid;
                             self.verbalizzaform.appelloid.value = appelloid;
                             self.submitgrade.appelloid.value = appelloid;
-                            self.multipleform.appelloid.value = appelloid;
                             self.update(registeredStudents); // self visible by closure
                             
                         } else if (req.status == 403) {
@@ -356,11 +334,10 @@
         }
 
         this.update = function(registeredStudents){
-            var elem, i, row, studentid, surname, name, email, corsoDiLaurea, grade, status, selection, selectioncell, linkcell, anchor;
+            var elem, i, row, studentid, surname, name, email, corsoDiLaurea, grade, status, selection, selectioncell, anchor;
             var self = this;
             var pair;
             var studentsgrades;
-
             this.studentcontainerbody.innerHTML = "";
 
             registeredStudents.forEach(function(registeredStudent){
@@ -394,8 +371,6 @@
                 status = document.createElement("td");
                 status.textContent = registeredStudent.status;
                 row.appendChild(status); 
-
-                if(self.multipleinsertion){
 
                 selectioncell = document.createElement("td");
                 anchor = document.createElement("a");
@@ -476,155 +451,16 @@
                 selection.appendChild(option17);
                 
                 anchor.appendChild(selection);
+                
+
                 selectioncell.appendChild(anchor);
                 row.appendChild(selectioncell);
-
-                } else {
-
-                    linkcell = document.createElement("td");
-                anchor = document.createElement("a");
-                linkcell.appendChild(anchor);
-                linkText = document.createTextNode("Modify");
-
-                anchor.appendChild(linkText);
-                anchor.setAttribute("examid", registeredStudent.examId);
-                anchor.addEventListener("click", (e) => {
-                     resultDetail.show(e.target.getAttribute("examid"));
-                }, false);
-
-                anchor.href = "#";
-                row.appendChild(linkcell);
-
-                }
-
                 self.studentcontainerbody.appendChild(row);
 
             });
-
-        this.studentcontainer.style.visibility = "visible";
-    }
+this.studentcontainer.style.visibility = "visible";
 }
-
-function ResultDetails(options){
-        this.alert = options['alert'];
-        this.studentinfocontainer = options['studentinfocontainer'];
-        this.name = options['name'];
-        this.surname = options['surname'];
-        this.id = options['id'];
-        this.email = options['email'];
-        this.cdl = options['cdl'];
-        //updatecontainer is the form to modify student's exam grade.
-        //Needs to contains examid's value.
-        this.updatecontainer = options['updatecontainer'];
-        this.gradecontainer = options['gradecontainer'];
-
-        this.reset = function(){
-            this.studentinfocontainer.style.visibility = "hidden";
-            this.updatecontainer.style.visibility = "hidden";
-            this.gradecontainer.style.visibility = "hidden";
-        }
-        
-        this.registerEvents = function(registeredStudents){
-
-            this.updatecontainer.querySelector("input[type='button']").addEventListener('click', (e) => {
-            var form = e.target.closest("form");
-            if (form.checkValidity()) {
-              var self = this;
-              var options = document.getElementById("id_selectgrade").options;
-              var selectedOption = document.getElementById("id_selectgrade").selectedIndex;
-              var gradeToSubmit = options[selectedOption].text;
-              var examid = form.querySelector("input[type='hidden'][name='examid']").value;
-              var appelloid = form.querySelector("input[type='hidden'][name='appelloid']").value;
-              console.log(examid);
-              console.log(gradeToSubmit);
-              makeCall("POST", 'UpdateSingleGrade?examid=' + examid + "&grade=" + gradeToSubmit, form,
-                function(req) {
-                  if (req.readyState == 4) {
-                    var message = req.responseText;
-                    console.log(message);
-                    if (req.status == 200) {
-                        //closing exam result details and refreshing registered students table
-                        self.reset();
-                        registeredStudents.show(appelloid);
-                    } else if (req.status == 403) {
-                            window.location.href = req.getResponseHeader("Location");
-                            window.sessionStorage.removeItem('username');
-                            window.sessionStorage.removeItem('role');
-                            window.sessionStorage.removeItem('userId');
-                  }
-                  else {
-                      self.alert.textContent = message;
-                    }
-                  }
-                }
-              );
-            } else {
-              form.reportValidity();
-            }
-          });
-        }
-
-        this.show = function(examid){
-            var self = this; 
-            makeCall("GET", "GetExamDetails?examId=" + examid, null,
-                function(req){
-                    if(req.readyState == 4){
-                        var message = req.responseText;
-                        if(req.status == 200){
-                            var exam = JSON.parse(req.responseText);
-                            self.update(exam);
-                            self.studentinfocontainer.style.visibility = "visible";
-                            switch(exam.status){
-                                case "INSERITO":
-                                self.updatecontainer.style.visibility = "visible";
-                                self.gradecontainer.style.visibility = "hidden";
-                                self.updatecontainer.examid.value = exam.examId;
-                                self.updatecontainer.appelloid.value = exam.appelloId;
-                                    break;
-                                case "NONINSERITO":
-                                    self.updatecontainer.style.visibility = "visible";
-                                    self.gradecontainer.style.visibility = "hidden";
-                                    self.updatecontainer.examid.value = exam.examId;
-                                    self.updatecontainer.appelloid.value = exam.appelloId;
-                                    break;
-                                case "PUBBLICATO":
-                                    self.updatecontainer.style.visibility = "hidden";
-                                    self.gradecontainer.style.visibility = "visible";
-                                    self.gradecontainer.textContent = exam.grade;
-                                    break;
-                                case "RIFIUTATO":
-                                    self.updatecontainer.style.visibility = "hidden";
-                                    self.gradecontainer.style.visibility = "visible";
-                                    self.gradecontainer.textContent = exam.grade;
-                                    break;
-                                case "VERBALIZZATO":
-                                    self.updatecontainer.style.visibility = "hidden";
-                                    self.gradecontainer.style.visibility = "visible";
-                                    self.gradecontainer.textContent = exam.grade;
-                                    break;
-                            }
-                        } else if(req.status == 403) {
-                            window.location.href = req.getResponseHeader("Location");
-                            window.sessionStorage.removeItem('role');
-                            window.sessionStorage.removeItem('userId');
-                            window.sessionStorage.removeItem('username');
-                        } else {
-                            self.alert.textContent = message;
-                        }
-                    }
-                }
-            );
-        }
-
-        this.update = function(exam){
-            this.name.textContent = exam.studentName;
-            this.surname.textContent = exam.studentSurname;
-            this.email.textContent = exam.studentEmail;
-            this.id.textContent = exam.studentId;
-            this.cdl.textContent = exam.corsoDiLaurea;
-            this.gradecontainer.textContent = exam.grade;
-        }
-    }
+}
 
 function Report(_report, _reportid, _reportdatetime, _reportappelloid,
     _studentreportcontainer, _studentreportcontainerbody, _closeform){
@@ -737,8 +573,7 @@ function Report(_report, _reportid, _reportdatetime, _reportappelloid,
                 document.getElementById("id_studentcontainerbody"),
                 document.getElementById("id_pubblicaform"),
                 document.getElementById("id_verbalizzaform"),
-                document.getElementById("id_submitgrade"),
-                document.getElementById("id_multipleform"));
+                document.getElementById("id_submitgrade"));
 
             report = new Report(document.getElementById("id_report"),
                 document.getElementById("id_reportid"),
@@ -750,20 +585,6 @@ function Report(_report, _reportid, _reportdatetime, _reportappelloid,
 
             report.registerEvents();
             registeredStudents.registerEvents(report);
-
-            resultDetail = new ResultDetails({
-                alert : alertContainer,
-                studentinfocontainer : document.getElementById("id_studentinfocontainer"),
-                name : document.getElementById("id_studentname"),
-                surname : document.getElementById("id_studentsurname"),
-                id : document.getElementById("id_studentid"),
-                email : document.getElementById("id_studentemail"),
-                cdl : document.getElementById("id_studentcdl"),
-                updatecontainer : document.getElementById("id_updatecontainer"),
-                gradecontainer : document.getElementById("id_gradecontainer")
-            });
-
-            resultDetail.registerEvents(registeredStudents);
 
             document.querySelector("a[href='Logout']").addEventListener('click', () => {
                 window.sessionStorage.removeItem('role');
@@ -780,7 +601,6 @@ function Report(_report, _reportid, _reportdatetime, _reportappelloid,
             courseList.show(function(){
                 courseList.autoclick(currentCourse);
             }); 
-            resultDetail.reset();
             registeredStudents.reset();
             report.reset();
         };

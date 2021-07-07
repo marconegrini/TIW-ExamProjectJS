@@ -34,15 +34,15 @@ import it.polimi.tiw.projects.utils.ConnectionHandler;
 /**
  * Servlet implementation class UpdateGrade
  */
-@WebServlet("/UpdateGrade")
-public class UpdateGrade extends HttpServlet {
+@WebServlet("/UpdateSingleGrade")
+public class UpdateSingleGrade extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
 
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public UpdateGrade() {
+	public UpdateSingleGrade() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -65,53 +65,39 @@ public class UpdateGrade extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		StringBuilder sb = new StringBuilder();
-		BufferedReader br = request.getReader();
-		String line = null;
-		while((line = br.readLine()) != null) {
-			sb.append(line);
+		Integer examid = null;
+		try {
+			examid = Integer.parseInt(request.getParameter("examid"));
+			System.out.println(examid);
+		} catch(IllegalArgumentException | NullPointerException e) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Invalid exam id input parameter");
+			return;
 		}
 		
-		String json = sb.toString();
-		System.out.println(json);
-		System.out.println(json);
-		JsonStreamParser parser = new JsonStreamParser(json);
-		ExamDAO examDao = new ExamDAO(connection);
-		boolean allInserted = true;
+		String grade = null;
 		try {
-			while(parser.hasNext()) {
-				JsonElement jsonElement = parser.next();
-				if(jsonElement.isJsonArray()) {
-					JsonArray jsonList = jsonElement.getAsJsonArray();
-					System.out.println(jsonList);
-					for(JsonElement elem : jsonList) {
-						JsonObject jsonObject = elem.getAsJsonObject();
-						Integer examid = jsonObject.get("key").getAsInt();
-						System.out.println("Exam id: " + examid);
-						String grade = jsonObject.get("value").getAsString();
-						System.out.println("Grade: " + grade);
-						try {
-							if(examDao.checkGradeInsertion(examid)) 
-								examDao.insertGrade(grade, examid);
-							else allInserted = false;
-						} catch (SQLException sqle) {
-							response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-							response.getWriter().println("Cannot update grades due to a database failure");
-							return;
-						}	
-					}
-				}
-			}
-		} catch (IllegalStateException e) {
+			grade = request.getParameter("grade");
+		} catch(IllegalArgumentException | NullPointerException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-			response.getWriter().println("Not a json object");
+			response.getWriter().println("Invalid grade input parameter");
+			return;
+		}
+		
+		ExamDAO examDao = new ExamDAO(connection);
+		try {
+			if(examDao.checkGradeInsertion(examid)) {
+				examDao.insertGrade(grade, examid);
+			}
+		} catch (SQLException sqle) {
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Cannot update grade due to a database failure");
 			return;
 		}
 		
 		response.setStatus(HttpServletResponse.SC_OK);
-		if(allInserted) 
-			response.getWriter().println("Grades updated correctly");
-		else response.getWriter().println("Not all grades correctly updated. Check exams status and try again.");
+		response.getWriter().println("Grade updated correctly");
+
 	}
 
 	public void destroy() {

@@ -53,19 +53,33 @@ public class Pubblica extends HttpServlet {
 			badRequest = true;
 			return;
 		}
-		
+		boolean publish;
 		if(!badRequest) {
 			try {
-				examDao.pubblica(appelloId);
-			} catch(SQLException sqle) {
-				sqlEx = true;
+				// checks wether or not there are Published exams
+				publish = examDao.checkPublishAvailability(appelloId);
+			} catch (SQLException sqle) {
+				sqle.printStackTrace();
 				response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
-				response.getWriter().println("Database failure while updating grade");
+				response.getWriter().println("Database failure while checking report availability");
 				return;
 			}
-			if(!sqlEx) {
-				response.setStatus(HttpServletResponse.SC_OK);
-				response.getWriter().println("Grades published");
+			if(!publish) {
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				response.getWriter().println("No exams to publish");
+			} else {
+				try {
+					examDao.pubblica(appelloId);
+				} catch(SQLException sqle) {
+					sqlEx = true;
+					response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+					response.getWriter().println("Database failure while updating grade");
+					return;
+				}
+				if(!sqlEx) {
+					response.setStatus(HttpServletResponse.SC_OK);
+					response.getWriter().println("Grades published");
+				}
 			}
 		}
 	}

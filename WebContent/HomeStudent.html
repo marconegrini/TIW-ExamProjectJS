@@ -23,7 +23,7 @@
 
 	<table>
 		<tr>
-			<td><table id="id_listcontainer" class="boxed">
+			<td><table id="id_listcontainer" class="boxed" border="1">
 					<thead>
 						<tr>
 							<th>Course Code</th>
@@ -35,7 +35,7 @@
 			</table></td>
 		</tr>
 		<tr>
-			<td><table id="id_detailcontainer" class="boxed">
+			<td><table id="id_detailcontainer" class="boxed">	
 					<thead>
 						<tr>
 							<th>Exam date</th>
@@ -45,7 +45,27 @@
 					</tbody>
 			</table></td>
 		</tr>
+		<tr>
+			<td>
+				<div id="id_resultcontainer">
+					Name: <span id="id_studentname"></span><br>
+					Surname: <span id="id_studentsurname"></span><br>
+					ID: <span id="id_studentid"></span><br>
+					Email: <span id="id_studentemail"></span><br>
+					Grade: <span id="id_studentgrade"></span><br>
+				</div>
+				<div>
+					<form id="id_rifiutaform" action="#">
+						<input type="hidden" name="examid">
+						<input type="hidden" name="appelloid">
+						<input type="button" type="button" name="Rifiuta" value="Rifiuta">
+					</form>
+				</div>
+				<span id="id_resultmessage"></span>
+			</td>
+		</tr>
 	</table>
+
 
 
 
